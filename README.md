@@ -40,7 +40,7 @@ A high-speed desktop application designed to download YouTube playlists and indi
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/mian-cs/YT-Downloader-free.git
-cd YT-Downloader
+cd YT-Downloader-free
 ```
 
 ### 2. Install Required Dependencies
