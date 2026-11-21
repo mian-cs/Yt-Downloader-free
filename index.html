@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Downloader - by Mian Moazzam</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js for 3D Cyber Matrix Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- 3D Holographic Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Scanline CRT Effect Overlay -->
+    <div class="scanlines"></div>
+
+    <div class="app-container">
+        <!-- Terminal Header -->
+        <header>
+            <div class="header-top-row">
+                <div class="sys-badge">
+                    <span class="status-indicator"></span>
+                    <span class="sys-text">SYS_ONLINE // v2.0</span>
+                </div>
+                
+                <!-- Theme Switcher Control -->
+                <div class="header-controls">
+                    <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
+                        <span id="theme-icon">☀️</span>
+                        <span id="theme-text">LIGHT MODE</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3D Holographic Cyber Cube -->
+            <div class="logo-3d">
+                <div class="cube">
+                    <div class="face front">YT</div>
+                    <div class="face back">DL</div>
+                    <div class="face right">MP3</div>
+                    <div class="face left">MP4</div>
+                    <div class="face top">⚡</div>
+                    <div class="face bottom">⚡</div>
+                </div>
+            </div>
+            
+            <h1 class="glitch-title" data-text="YT DOWNLOADER">YT DOWNLOADER</h1>
+            <p class="subtitle">&lt; HIGH-SPEED MULTI-THREADED STREAM & PLAYLIST EXTRACTOR &gt;</p>
+
+            <!-- Prominent Developer & Rights Interface Banner -->
+            <div class="developer-badge-container">
+                <span class="dev-tag">⚡ DEVELOPER:</span>
+                <span class="dev-highlight">MIAN MOAZZAM</span>
+                <span class="dev-sep">•</span>
+                <span class="rights-highlight">ALL RIGHTS RESERVED</span>
+            </div>
+
+            <!-- Developer Portfolio & Social Links Bar -->
+            <div class="developer-links-bar">
+                <button class="dev-link-btn" onclick="openExternal('https://mianmoazzam.me')" title="Personal Portfolio Website">
+                    <span class="link-icon">🌐</span> <span class="link-label">mianmoazzam.me</span>
+                </button>
+                <button class="dev-link-btn" onclick="openExternal('https://github.com/mian-cs')" title="GitHub: @mian-cs">
+                    <span class="link-icon">⚡</span> <span class="link-label">GitHub</span>
+                </button>
+                <button class="dev-link-btn" onclick="openExternal('https://www.linkedin.com/in/mian-cs')" title="LinkedIn: in/mian-cs">
+                    <span class="link-icon">💼</span> <span class="link-label">LinkedIn</span>
+                </button>
+                <button class="dev-link-btn" onclick="openExternal('https://www.instagram.com/mian.cs_')" title="Instagram: @mian.cs_">
+                    <span class="link-icon">📷</span> <span class="link-label">Instagram</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Target URL Input -->
+            <div class="input-group">
+                <label class="cyber-label"><span class="cmd-prompt">&gt;</span> TARGET_URL // PLAYLIST OR VIDEO</label>
+                <div class="input-row">
+                    <input type="text" id="url-input" placeholder="https://youtube.com/playlist?list=..." oninput="checkUrl()" spellcheck="false" autocomplete="off">
+                    <button class="btn-secondary cyber-btn" onclick="pasteUrl()">
+                        <span class="btn-glow"></span>
+                        <span class="btn-text">📋 PASTE</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cyber Target Telemetry Card -->
+            <div id="playlist-info-card" class="playlist-info-card hidden">
+                <div id="playlist-loading" class="cyber-spinner"></div>
+                <div id="playlist-data" class="hidden">
+                    <div class="card-header">
+                        <span class="pulse-dot"></span>
+                        <h4 id="playlist-title">DETECTING TARGET...</h4>
+                    </div>
+                    <div class="badge-container">
+                        <span id="playlist-count" class="badge">0 TARGETS</span>
+                        <span class="badge badge-accent">READY FOR HARVEST</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Codec / Format & Quality Selection -->
+            <div class="input-group">
+                <label class="cyber-label"><span class="cmd-prompt">&gt;</span> PAYLOAD_FORMAT // QUALITY & CODEC</label>
+                <div class="select-wrapper">
+                    <select id="quality-select">
+                        <optgroup label="🎵 AUDIO EXTRACTION (HIGH-SPEED MP3)">
+                            <option value="Audio (MP3 320kbps)">🎵 MP3 Audio - 320 kbps (Ultra Studio Quality)</option>
+                            <option value="Audio (MP3 192kbps)">🎵 MP3 Audio - 192 kbps (High Quality)</option>
+                        </optgroup>
+                        <optgroup label="🎬 VIDEO STREAMS (MP4 + AUDIO)">
+                            <option value="Best Available" selected>🎬 Best Available (Maximum Stream Bitrate)</option>
+                            <option value="1080p">🎬 1080p Full HD (1920x1080)</option>
+                            <option value="720p">🎬 720p HD (1280x720)</option>
+                            <option value="480p">🎬 480p Standard (854x480)</option>
+                            <option value="360p">🎬 360p Compact (640x360)</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Save Destination Folder -->
+            <div class="input-group">
+                <label class="cyber-label"><span class="cmd-prompt">&gt;</span> STORAGE_DIR // DESTINATION PATH</label>
+                <div class="input-row">
+                    <input type="text" id="folder-input" placeholder="Select destination directory..." spellcheck="false">
+                    <button class="btn-secondary cyber-btn" onclick="selectFolder()">
+                        <span class="btn-glow"></span>
+                        <span class="btn-text">📁 BROWSE</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="btn-start" class="btn-primary cyber-btn-large" onclick="startDownload()">
+                    <span class="cyber-glitch-overlay"></span>
+                    <span class="btn-text">⚡ INITIATE HARVEST</span>
+                </button>
+                <button id="btn-stop" class="btn-danger cyber-btn-large" onclick="stopDownload()" disabled>
+                    <span class="btn-text">■ INSTANT STOP</span>
+                </button>
+            </div>
+
+            <!-- Cyber HUD Status Terminal -->
+            <div class="status-section cyber-hud-panel">
+                <div class="hud-top-bar">
+                    <span class="hud-title">TERMINAL // STREAM_TELEMETRY</span>
+                    <span id="status-text" class="status-badge">STATUS: IDLE</span>
+                </div>
+                
+                <div class="current-target-container">
+                    <span class="target-prefix">&gt;&gt;</span>
+                    <p id="current-video">System Standby. Awaiting Target URL.</p>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress-scanner"></div>
+                    </div>
+                </div>
+
+                <div class="hud-metrics-grid">
+                    <div class="metric-box">
+                        <span class="metric-label">PROGRESS</span>
+                        <span id="percentage-text" class="metric-value">0.0%</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">TRANSFER_RATE</span>
+                        <span id="speed-text" class="metric-value">-- MB/s</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">TIME_REMAINING</span>
+                        <span id="eta-text" class="metric-value">--:--</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">PAYLOAD_SIZE</span>
+                        <span id="size-text" class="metric-value">0 MB</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <span class="footer-app-name">YT DOWNLOADER // SECURE PROTOCOL</span>
+                <div class="footer-social-links">
+                    <a href="javascript:void(0)" onclick="openExternal('https://mianmoazzam.me')">🌐 mianmoazzam.me</a>
+                    <span class="footer-link-sep">•</span>
+                    <a href="javascript:void(0)" onclick="openExternal('https://github.com/mian-cs')">GitHub</a>
+                    <span class="footer-link-sep">•</span>
+                    <a href="javascript:void(0)" onclick="openExternal('https://www.linkedin.com/in/mian-cs')">LinkedIn</a>
+                    <span class="footer-link-sep">•</span>
+                    <a href="javascript:void(0)" onclick="openExternal('https://www.instagram.com/mian.cs_')">Instagram</a>
+                </div>
+                <span class="footer-credits">Developed by <strong>Mian Moazzam</strong> &bull; &copy; 2026 All Rights Reserved</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ==========================================
+        // 3D CYBERPUNK MATRIX WAVE & PARTICLES (Three.js)
+        // ==========================================
+        const canvas = document.getElementById('bg-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+        // 3D Cyber Grid Particles
+        const particlesCount = 900;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+
+        const colorCyan = new THREE.Color(0x00f0ff);
+        const colorGreen = new THREE.Color(0x00ff88);
+
+        for (let i = 0; i < particlesCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 14;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+
+            const mixedColor = colorCyan.clone().lerp(colorGreen, Math.random());
+            colors[i * 3] = mixedColor.r;
+            colors[i * 3 + 1] = mixedColor.g;
+            colors[i * 3 + 2] = mixedColor.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.022,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85
+        });
+
+        const particlesMesh = new THREE.Points(geometry, material);
+        scene.add(particlesMesh);
+
+        // 3D Wireframe Cyber Polyhedron in Center Background
+        const polyGeo = new THREE.IcosahedronGeometry(2.4, 1);
+        const polyMat = new THREE.MeshBasicMaterial({
+            color: 0x00f0ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.12
+        });
+        const cyberSphere = new THREE.Mesh(polyGeo, polyMat);
+        scene.add(cyberSphere);
+
+        camera.position.z = 4.2;
+
+        // Interactive Mouse Parallax Effect
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 0.6;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 0.6;
+        });
+
+        // Animation Loop with Visibility Saver
+        let isWindowActive = true;
+        document.addEventListener('visibilitychange', () => {
+            isWindowActive = !document.hidden;
+            if (isWindowActive) requestAnimationFrame(animate);
+        });
+
+        function animate() {
+            if (!isWindowActive) return;
+            requestAnimationFrame(animate);
+
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
+
+            particlesMesh.rotation.y += 0.0008;
+            particlesMesh.rotation.x += 0.0004;
+
+            cyberSphere.rotation.x += 0.002;
+            cyberSphere.rotation.y += 0.003;
+
+            camera.position.x = targetX;
+            camera.position.y = -targetY;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ==========================================
+        // THEME SWITCHER (LIGHT & DARK MODE)
+        // ==========================================
+        function applyTheme(theme) {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                if (themeIcon) themeIcon.innerText = '🌙';
+                if (themeText) themeText.innerText = 'DARK MODE';
+                if (typeof polyMat !== 'undefined') polyMat.color.setHex(0x007799);
+            } else {
+                document.body.classList.remove('light-theme');
+                if (themeIcon) themeIcon.innerText = '☀️';
+                if (themeText) themeText.innerText = 'LIGHT MODE';
+                if (typeof polyMat !== 'undefined') polyMat.color.setHex(0x00f0ff);
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.contains('light-theme');
+            const nextTheme = isLight ? 'dark' : 'light';
+            localStorage.setItem('app_theme', nextTheme);
+            applyTheme(nextTheme);
+        }
+
+        // Initialize saved theme on start
+        const savedTheme = localStorage.getItem('app_theme') || 'dark';
+        applyTheme(savedTheme);
+
+        // ==========================================
+        // EXTERNAL URL HANDLER (Opens in Default Browser)
+        // ==========================================
+        function openExternal(url) {
+            if (window.pywebview && window.pywebview.api && window.pywebview.api.open_external_url) {
+                window.pywebview.api.open_external_url(url);
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+
+        // ==========================================
+        // PYWEBVIEW API CONNECTIONS
+        // ==========================================
+        window.addEventListener('pywebviewready', () => {
+            if (window.pywebview && window.pywebview.api && window.pywebview.api.get_default_folder) {
+                window.pywebview.api.get_default_folder().then(folder => {
+                    if (folder) document.getElementById('folder-input').value = folder;
+                });
+            }
+        });
+
+        // ==========================================
+        // PLAYLIST INFO & URL CHECK
+        // ==========================================
+        let urlCheckTimeout;
+
+        function checkUrl() {
+            const url = document.getElementById('url-input').value.trim();
+            const infoCard = document.getElementById('playlist-info-card');
+            
+            clearTimeout(urlCheckTimeout);
+
+            if (!url) {
+                infoCard.classList.add('hidden');
+                return;
+            }
+
+            urlCheckTimeout = setTimeout(() => {
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    if (window.pywebview && window.pywebview.api) {
+                        window.pywebview.api.fetch_playlist_info(url);
+                    }
+                }
+            }, 500);
+        }
+
+        function showPlaylistLoading() {
+            document.getElementById('playlist-info-card').classList.remove('hidden');
+            document.getElementById('playlist-loading').classList.remove('hidden');
+            document.getElementById('playlist-data').classList.add('hidden');
+        }
+
+        function showPlaylistInfo(title, count, isSingle = false) {
+            document.getElementById('playlist-loading').classList.add('hidden');
+            document.getElementById('playlist-data').classList.remove('hidden');
+            
+            const titleElem = document.getElementById('playlist-title');
+            titleElem.innerText = title;
+            titleElem.style.color = '#00f0ff';
+            document.getElementById('playlist-count').innerText = isSingle ? "1 TARGET (SINGLE MEDIA)" : `${count} TARGETS (PLAYLIST)`;
+        }
+
+        function showPlaylistError(msg) {
+            document.getElementById('playlist-info-card').classList.remove('hidden');
+            document.getElementById('playlist-loading').classList.add('hidden');
+            document.getElementById('playlist-data').classList.remove('hidden');
+            const titleElem = document.getElementById('playlist-title');
+            titleElem.innerText = msg ? ("ERR // " + msg) : "ERR // TARGET UNREACHABLE";
+            titleElem.style.color = "#ff0055";
+            document.getElementById('playlist-count').innerText = "INVALID TARGET";
+        }
+
+        function pasteUrl() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.paste_url().then(url => {
+                    if (url) {
+                        document.getElementById('url-input').value = url;
+                        checkUrl();
+                    }
+                });
+            }
+        }
+
+        function selectFolder() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.select_folder().then(folder => {
+                    if (folder) document.getElementById('folder-input').value = folder;
+                });
+            }
+        }
+
+        function startDownload() {
+            const url = document.getElementById('url-input').value.trim();
+            const folder = document.getElementById('folder-input').value.trim();
+            const quality = document.getElementById('quality-select').value;
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.start_download(url, folder, quality);
+            }
+        }
+
+        function stopDownload() {
+            // Immediately disable stop button and trigger instant stop in Python
+            document.getElementById('btn-stop').disabled = true;
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.stop_download();
+            }
+        }
+
+        // ==========================================
+        // UI UPDATE FUNCTIONS (CALLED BY PYTHON)
+        // ==========================================
+        function updateStatusText(statusMsg) {
+            const statusElem = document.getElementById('status-text');
+            statusElem.innerText = statusMsg;
+            statusElem.className = 'status-badge status-active';
+        }
+
+        function setCurrentVideo(videoName) {
+            if (videoName) {
+                document.getElementById('current-video').innerText = videoName;
+            }
+        }
+
+        function updateProgress(percentage, videoName, speed, eta, size) {
+            const validPercent = Math.min(Math.max(percentage, 0), 100);
+            document.getElementById('progress-bar').style.width = validPercent + '%';
+            document.getElementById('percentage-text').innerText = validPercent.toFixed(1) + '%';
+            if (videoName) {
+                document.getElementById('current-video').innerText = videoName;
+            }
+            if (speed) document.getElementById('speed-text').innerText = speed;
+            if (eta) document.getElementById('eta-text').innerText = eta;
+            if (size) document.getElementById('size-text').innerText = size;
+        }
+
+        function setDownloadingState(isDownloading) {
+            document.getElementById('btn-start').disabled = isDownloading;
+            document.getElementById('btn-stop').disabled = !isDownloading;
+            
+            const statusElem = document.getElementById('status-text');
+            statusElem.innerText = isDownloading ? 'STATUS: INITIALIZING...' : 'STATUS: IDLE';
+            statusElem.className = isDownloading ? 'status-badge status-active' : 'status-badge';
+            
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('percentage-text').innerText = '0.0%';
+        }
+
+        function downloadFinished() {
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('percentage-text').innerText = '100.0%';
+            
+            const statusElem = document.getElementById('status-text');
+            statusElem.innerText = 'STATUS: COMPLETED!';
+            statusElem.className = 'status-badge status-success';
+            document.getElementById('current-video').innerText = 'All targets downloaded and verified successfully.';
+        }
+
+        function downloadStopped() {
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            
+            const statusElem = document.getElementById('status-text');
+            statusElem.innerText = 'STATUS: ABORTED (INSTANT)';
+            statusElem.className = 'status-badge status-error';
+            document.getElementById('current-video').innerText = 'Download terminated immediately. Active stream aborted.';
+            document.getElementById('speed-text').innerText = '-- MB/s';
+            document.getElementById('eta-text').innerText = '--:--';
+        }
+
+        function showError(msg) {
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            const statusElem = document.getElementById('status-text');
+            statusElem.innerText = 'STATUS: CRITICAL_ERR';
+            statusElem.className = 'status-badge status-error';
+            alert("SECURITY / STREAM EXCEPTION:\n" + msg);
+        }
+    </script>
+</body>
+</html>
